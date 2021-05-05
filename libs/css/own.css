@@ -1,0 +1,55 @@
+body{
+    margin:0;
+    padding:0;
+}
+
+i{
+    width:20px;
+    height:20px;
+    font-size: 30px;
+}
+
+.result-card{
+    box-shadow: 3px 3px 15px black;
+}
+
+span{
+    font-weight: normal;
+}
+
+ul{
+    list-style-type: none;
+}
+li{
+    display:inline-block;
+}
+
+#helper{
+    position:fixed;
+    z-index:999;
+    margin-left:auto;
+    margin-right: auto;
+    height:auto;
+    top:30%;
+    left:0;
+    right:0;
+    background-color: rgb(209, 209, 209);
+    display: none;
+    
+    box-shadow: 2px 2px 5px;
+}
+
+#helpertable,input{
+    width:100%;
+}
+
+
+
+#helper>h5{
+    margin-top:5px;
+    margin-bottom: 5px;
+}
+
+.cancel,.save{
+    font-weight:bold;
+}
