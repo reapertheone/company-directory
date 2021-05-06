@@ -51,13 +51,13 @@ setAddButtonAndSearch(tableName)
 
 const getPersonnels=async ()=>{
     return $.ajax({
-        url:'libs/php/getAll.php'
+        url:'php/getAll.php'
     })
 }
 
 const getSupportData=async ()=>{
     return $.ajax({
-        url:'libs/php/getCreatorData.php'
+        url:'php/getCreatorData.php'
     })
 }
 
@@ -222,9 +222,9 @@ const saveOnClick=async (type,id)=>{
     })
 
     let res=await $.ajax({
-        url:type==="personnel"?'libs/php/insertPersonnel.php':
-            type==="department"?'libs/php/insertDepartment.php':
-                                'libs/php/insertLocation.php',
+        url:type==="personnel"?'php/insertPersonnel.php':
+            type==="department"?'php/insertDepartment.php':
+                                'php/insertLocation.php',
         method:'POST',
         data
     })
@@ -252,7 +252,8 @@ const removeOnClick=async (e)=>{
    let targetID=clicked==="i"?e.target.parentNode.id:e.target.id
    let id=targetID.split('-')[2]
    let table=targetID.split('-')[1]
-   let confirmation=await window.confirm(`Do you want to remove the following ${table} with ID of ${id}`)
+   if(table==="personnel"){
+    let confirmation=await window.confirm(`Do you want to remove the following ${table} with ID of ${id}`)
     if(confirmation){
         let res=await remove(id,table)
         if(res.status.error) alert(res.status.message)
@@ -261,6 +262,25 @@ const removeOnClick=async (e)=>{
     }else{
         alert('cancelled')
     }
+   }else{
+    let checkResponse=await $.ajax({url:table==="location"?'php/getDepartmentByLocationID.php':'php/getPersonByDepartmentID.php',data:{id}})
+    let count=checkResponse.data[0].count
+
+    if(count==="0"){
+        let confirmation=await window.confirm(`Do you want to remove the following ${table} with ID of ${id}`)
+    if(confirmation){
+        let res=await remove(id,table)
+        if(res.status.error) alert(res.status.message)
+    
+        init(table)
+    }else{
+        alert('cancelled')
+    }
+    }else{
+        alert(`You can\'t delete the ${table} with id:${id} because it is used ${count} times`)
+    }
+   }
+  
    
 
    
@@ -345,7 +365,7 @@ const setAddButtonAndSearch=(tableName)=>{
 
 const remove=async (id,table)=>{
     return $.ajax({
-        url:'libs/php/deleteByID.php',
+        url:'php/deleteByID.php',
         data:{id,table},
         method:'POST'
     })
@@ -358,7 +378,7 @@ const search=async (name)=>{
     console.log('fn',firstName,lastName)
         
     let res=await $.ajax({
-                url:'libs/php/searchPersonnel.php',
+                url:'php/searchPersonnel.php',
                 data:typeof lastName!=="undefined"?{firstName,lastName}:{firstName},                
                 method:'GET'
             })
