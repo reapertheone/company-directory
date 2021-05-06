@@ -28,12 +28,16 @@ const init=async (tableName)=>{
  let personnelsData=personnelRes.data
  let creatorData=creatorRes.data
 
+ console.log(creatorData)
+
  let currentData=tableName==="personnel"?personnelsData:
                  creatorData[tableName]
     console.log(currentData)
 
 
  let divArray=currentData.map((data)=>{
+     console.log(data)
+     
     return createModal(data)
  })
 
@@ -210,15 +214,15 @@ const editOnClick=(data)=>{
 }
 
 const saveOnClick=async (type,id)=>{
-    let data={}
+    let formdata={}
     if(typeof id!=="undefined") data.id=id
-    console.log(data)
+    console.log(formdata)
 
     keyProps[type].forEach((elem)=>{
         let field=document.querySelector(`#${elem.id}`)
         let value=field.value
         let key=elem.field==="select"?`${elem.valueKey}ID`:elem.valueKey
-        data[key]=value
+        formdata[key]=value
     })
 
     let res=await $.ajax({
@@ -226,7 +230,7 @@ const saveOnClick=async (type,id)=>{
             type==="department"?'php/insertDepartment.php':
                                 'php/insertLocation.php',
         method:'POST',
-        data
+        data:formdata
     })
         
         if(res.status.code==200){

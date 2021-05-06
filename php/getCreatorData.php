@@ -23,7 +23,7 @@ $executionStartTime = microtime(true);
 
 	}
 
-    $query="SELECT d.id,d.name,l.name as location  FROM department d right join location l on d.locationID=l.id ORDER BY name asc";
+    $query="SELECT d.id,d.name,l.name as location  FROM department d left join location l on (l.id=d.locationID) ORDER BY name asc"; 
     $result = $conn->query($query);
 
     if (!$result) {
