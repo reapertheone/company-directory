@@ -3,6 +3,9 @@ body{
     padding:0;
 }
 
+
+
+
 i{
     width:20px;
     height:20px;
@@ -11,10 +14,6 @@ i{
 
 .result-card{
     box-shadow: 3px 3px 15px black;
-}
-
-td{
-    width:50%;
 }
 
 span{

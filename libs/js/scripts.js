@@ -55,13 +55,13 @@ setAddButtonAndSearch(tableName)
 
 const getPersonnels=async ()=>{
     return $.ajax({
-        url:'php/getAll.php'
+        url:'libs/php/getAll.php'
     })
 }
 
 const getSupportData=async ()=>{
     return $.ajax({
-        url:'php/getCreatorData.php'
+        url:'libs/php/getCreatorData.php'
     })
 }
 
@@ -198,8 +198,13 @@ const editOnClick=(data)=>{
             table.appendChild(row)
         })
     saveButton.addEventListener('click',(e)=>{
-        let type=e.target.id.split('-')[1]
-        let id=e.target.id.split('-')[2]
+        let clicked=e.target.localName
+        let targetID=clicked==="strong"?e.target.parentNode.id:e.target.id
+        
+        console.log(targetID)
+        let type=targetID.split('-')[1]
+        let id=targetID.split('-')[2]
+        console.log(type,id)
         saveOnClick(type,id)
     })
     cancelButton.addEventListener('click',cancelOnClick)
@@ -214,32 +219,41 @@ const editOnClick=(data)=>{
 }
 
 const saveOnClick=async (type,id)=>{
+    console.log(type)
     let formdata={}
-    if(typeof id!=="undefined") data.id=id
+    if(typeof id!=="undefined") formdata.id=id
     console.log(formdata)
-
+    
     keyProps[type].forEach((elem)=>{
         let field=document.querySelector(`#${elem.id}`)
         let value=field.value
         let key=elem.field==="select"?`${elem.valueKey}ID`:elem.valueKey
+        if(key==="firstName"||key==="lastName"){
+            let stringArr=value.split('')
+            stringArr[0]=stringArr[0].toUpperCase()
+            value=stringArr.join('')
+            console.log(value)
+        }
         formdata[key]=value
     })
 
     let res=await $.ajax({
-        url:type==="personnel"?'php/insertPersonnel.php':
-            type==="department"?'php/insertDepartment.php':
-                                'php/insertLocation.php',
+        url:type==="personnel"?'libs/php/insertPersonnel.php':
+            type==="department"?'libs/php/insertDepartment.php':
+                                'libs/php/insertLocation.php',
         method:'POST',
         data:formdata
     })
         
         if(res.status.code==200){
-            alert(`Modification successfull the result set has been updated`)
+            //alert(`Modification successfull the result set has been updated`)
+            $('#saveSuccess').show()
             $('#helper').remove()
             init(type)
             
         }else{
-            alert(`Modification was not successfull please reload the page and try again`)
+            $('#saveFail').show()
+            //alert(`Modification was not successfull please reload the page and try again`)
             $('#helper').remove()
         }
         
@@ -257,31 +271,40 @@ const removeOnClick=async (e)=>{
    let id=targetID.split('-')[2]
    let table=targetID.split('-')[1]
    if(table==="personnel"){
-    let confirmation=await window.confirm(`Do you want to remove the following ${table} with ID of ${id}`)
+    let confirmation=await window.confirm(`Are you sure you want to delete the record?`)
     if(confirmation){
         let res=await remove(id,table)
         if(res.status.error) alert(res.status.message)
     
         init(table)
-    }else{
-        alert('cancelled')
     }
    }else{
-    let checkResponse=await $.ajax({url:table==="location"?'php/getDepartmentByLocationID.php':'php/getPersonByDepartmentID.php',data:{id}})
+    let checkResponse=await $.ajax({url:table==="location"?'libs/php/getDepartmentByLocationID.php':'libs/php/getPersonByDepartmentID.php',data:{id}})
     let count=checkResponse.data[0].count
 
     if(count==="0"){
-        let confirmation=await window.confirm(`Do you want to remove the following ${table} with ID of ${id}`)
+        let confirmation=await window.confirm(`Are you sure you want to delete this record?`)
     if(confirmation){
         let res=await remove(id,table)
         if(res.status.error) alert(res.status.message)
     
         init(table)
-    }else{
-        alert('cancelled')
     }
     }else{
-        alert(`You can\'t delete the ${table} with id:${id} because it is used ${count} times`)
+        /*
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <strong>Holy guacamole!</strong> You should check in on some of those fields below.
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        */
+        $('#noDelete').show(200)
+
+
+
+
+        //alert(`You can\'t delete the this record because it is in use.`)
     }
    }
   
@@ -369,7 +392,7 @@ const setAddButtonAndSearch=(tableName)=>{
 
 const remove=async (id,table)=>{
     return $.ajax({
-        url:'php/deleteByID.php',
+        url:'libs/php/deleteByID.php',
         data:{id,table},
         method:'POST'
     })
@@ -382,7 +405,7 @@ const search=async (name)=>{
     console.log('fn',firstName,lastName)
         
     let res=await $.ajax({
-                url:'php/searchPersonnel.php',
+                url:'libs/php/searchPersonnel.php',
                 data:typeof lastName!=="undefined"?{firstName,lastName}:{firstName},                
                 method:'GET'
             })
@@ -414,6 +437,8 @@ searchField.addEventListener('keyup',async (e)=>{
            })
         }
 })
+
+$('.close').on('click',()=>{$('.alert').hide()})
 
 //editOnClick({"id":"95","lastName":"Baudi","firstName":"Dulcie","jobTitle":"","email":"dbaudi2m@last.fm","department":"Marketing","location":"New York"})
 

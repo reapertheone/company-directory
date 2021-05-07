@@ -38,7 +38,7 @@
 
 
 	if(!isset($_REQUEST['id'])){
-		$query = "INSERT INTO location (name) VALUES('{$_REQUEST['name']}')";
+		$query = 'INSERT INTO location (name) VALUES("' . $_REQUEST['name'] . '")';
 		}else{
 		$query="UPDATE location
 				SET name={$_REQUEST['name']}
