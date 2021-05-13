@@ -23,26 +23,27 @@ instanceSelectors.on('click',(e)=>{
 })
 
 const init=async (tableName)=>{
+ $('.loading').show()
  let personnelRes=await getPersonnels()
  let creatorRes=await getSupportData()
  let personnelsData=personnelRes.data
  let creatorData=creatorRes.data
 
- console.log(creatorData)
+ //console.log(creatorData)
 
  let currentData=tableName==="personnel"?personnelsData:
                  creatorData[tableName]
-    console.log(currentData)
+    //console.log(currentData)
 
 
  let divArray=currentData.map((data)=>{
-     console.log(data)
+     //console.log(data)
      
     return createModal(data)
  })
 
-//console.log(divArray)
-let resultDiv=document.querySelector('#results')
+////console.log(divArray)
+let resultDiv=document.querySelector('#results>.row')
     resultDiv.innerHTML=""
 divArray.forEach((div)=>{
     resultDiv.appendChild(div)
@@ -50,6 +51,7 @@ divArray.forEach((div)=>{
 
 setAddButtonAndSearch(tableName)
 
+$('.loading').hide()
 }
 
 
@@ -82,11 +84,11 @@ const createModal=(data)=>{
         editButton.innerHTML='<i class="m-3 fas fa-user-edit"></i>'
         deleteButton.innerHTML='<i class="m-3 fas fa-user-times">'
         
-        buttonDiv.className="m-2 btn-group container text-center"
+        buttonDiv.className="m-2 btn-group container-fluid text-center"
         table.className="container-fluid"
         innerDiv.className="result-general"
         h4.className="text-center"
-        mainDiv.className="result-card mt-3 container-fluid"
+        mainDiv.className="result-card mt-5 col-lg-4 col-xs-12"
         mainDiv.id=data.id
 
     let keys=Object.keys(data)
@@ -127,8 +129,24 @@ const createModal=(data)=>{
     mainDiv.appendChild(innerDiv)
     mainDiv.appendChild(buttonDiv)
     deleteButton.addEventListener('click',removeOnClick)
-    editButton.addEventListener('click',(e)=>{
-        editOnClick(data)
+    editButton.addEventListener('click',async (e)=>{
+        let clicked=e.target.localName
+        let targetID=clicked==="i"?e.target.parentNode.id:e.target.id
+        
+        let idArr=targetID.split('-')
+        let type=idArr[1]
+        let id=idArr[2]
+        //console.log(idArr)
+        //console.log(type,id)
+        let res=await $.ajax({
+            url:type==="personnel"?'libs/php/getPersonnel.php':
+                type==="department"?'libs/php/getDepartment.php':
+                                    'libs/php/getLocation.php',
+            data:{id}
+        })
+
+        let editData=res.data[0]
+        editOnClick(editData)
     })
 
     buttonDiv.appendChild(editButton)
@@ -142,8 +160,9 @@ const editOnClick=(data)=>{
     let helper=$('#helper')
         if(helper.length!==0) helper.remove()
     let keys=Object.keys(data)
+    //console.log(keys)
     let type=keys.includes("firstName")     ?   "personnel"  :
-             keys.includes("location")    ?   "department" :
+             keys.includes("locationID")    ?   "department" :
                                                 "location"
 
     let dataSet=keyProps[type]
@@ -181,7 +200,7 @@ const editOnClick=(data)=>{
             field.className="form-control"
             if(elem.field==="input"){
                 field.type=elem.type
-                field.placeholder=elem.placeholder
+                
                 field.value=data[elem.valueKey]
             }else{
                 let optionListRes=await getSupportData()
@@ -190,8 +209,11 @@ const editOnClick=(data)=>{
                     let option=document.createElement('option')
                     option.value=optionData.id
                     option.innerText=optionData.name
-                    
-                    option.selected=optionData.name===data[elem.valueKey]
+                    //console.log(data)
+                    //console.log(optionData)
+                    option.selected=type==="personnel"?optionData.id===data.departmentID:
+                                                       optionData.id===data.locationID
+                                                        
                     field.appendChild(option)
                 })
             }
@@ -201,10 +223,10 @@ const editOnClick=(data)=>{
         let clicked=e.target.localName
         let targetID=clicked==="strong"?e.target.parentNode.id:e.target.id
         
-        console.log(targetID)
+        //console.log(targetID)
         let type=targetID.split('-')[1]
         let id=targetID.split('-')[2]
-        console.log(type,id)
+        //console.log(type,id)
         saveOnClick(type,id)
     })
     cancelButton.addEventListener('click',cancelOnClick)
@@ -219,10 +241,10 @@ const editOnClick=(data)=>{
 }
 
 const saveOnClick=async (type,id)=>{
-    console.log(type)
+    //console.log(type)
     let formdata={}
     if(typeof id!=="undefined") formdata.id=id
-    console.log(formdata)
+    //console.log(formdata)
     
     keyProps[type].forEach((elem)=>{
         let field=document.querySelector(`#${elem.id}`)
@@ -232,7 +254,7 @@ const saveOnClick=async (type,id)=>{
             let stringArr=value.split('')
             stringArr[0]=stringArr[0].toUpperCase()
             value=stringArr.join('')
-            console.log(value)
+            //console.log(value)
         }
         formdata[key]=value
     })
@@ -262,7 +284,7 @@ const saveOnClick=async (type,id)=>{
 const cancelOnClick=(e)=>{
      $('#helper').remove()
      
-     console.log('helper removed')
+     //console.log('helper removed')
 }
 
 const removeOnClick=async (e)=>{
@@ -360,7 +382,7 @@ const setAddButtonAndSearch=(tableName)=>{
             field.className="form-control"
             if(elem.field==="input"){
                 field.type=elem.type
-                field.placeholder=elem.placeholder
+               // field.placeholder=elem.placeholder
                 
             }else{
                 let optionListRes=await getSupportData()
@@ -402,7 +424,7 @@ const remove=async (id,table)=>{
 const search=async (name)=>{
     let strArr=name.split(' ')
     const [firstName,lastName]=strArr
-    console.log('fn',firstName,lastName)
+    //console.log('fn',firstName,lastName)
         
     let res=await $.ajax({
                 url:'libs/php/searchPersonnel.php',
@@ -427,7 +449,7 @@ searchField.addEventListener('keyup',async (e)=>{
         if(response==="Error happened"){
             alert('Error happened!!!Please reload the page')
         }else{
-            let resultDiv=document.querySelector('#results')
+            let resultDiv=document.querySelector('#results>.row')
             resultDiv.innerHTML=""
            let modalArray=response.map((data)=>{
                return createModal(data)

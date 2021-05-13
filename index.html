@@ -11,7 +11,7 @@
 </head>
 <body>
 
-    <div id="instaceSelector" class="container text-center mt-3 mb-3">
+    <div id="instaceSelector" class="container text-center mt-3 mb-3 p-2 postion-sticky sticky-top bg-light">
         <div id="personnel" class="btn btn-primary">Employees</div>
         <div id="department" class="btn btn-primary">Departments</div>
         <div id="location" class="btn btn-primary">Locations</div>
@@ -48,12 +48,21 @@
         
     </div>
 </div>
-    <div id="results" class="container mt-3">
+
+<div class="loading container-fluid text-center text-light shadow">
+    <div id="blur"></div>
+    <h1 class="text-center text-dark">Loading</h1>
+    <img src="loading.gif">
+</div>
+    <div id="results" class="container-fluid mt-3">
        
+        <div class="row">
 
 
+        </div>
 
 
+<!--
         <div class="result-card mt-3 container-fluid">
             <div class="result-general">
                 <h4 class="text-center">Placeholder Long Name <br><span class="postition">(Assistant Manager)</span></h4>
@@ -82,7 +91,7 @@
                 
             </div>
         </div>
-
+-->
         
     </div>
     <div id="helper" class="container text-center">
@@ -124,6 +133,8 @@
                 
             </div>
     </div>
+
+    
 
 </div>
     <script src="./libs/js/vendor/jquery-2.2.3.min.js"></script>

@@ -1,18 +1,17 @@
 <?php
 
-	// example use from browser
-	// http://localhost/companydirectory/libs/php/getPersonnel.php?id=1
 
-	// remove next two lines for production
+	// example use from browser
+	// http://localhost/companydirectory/libs/php/getDepartmentByID.php?id=2
 	
+	// remove next two lines for production
+
 	ini_set('display_errors', 'On');
 	error_reporting(E_ALL);
 
 	$executionStartTime = microtime(true);
 
 	include("config.php");
-
-	header('Content-Type: application/json; charset=UTF-8');
 
 	$conn = new mysqli($cd_host, $cd_user, $cd_password, $cd_dbname, $cd_port, $cd_socket);
 
@@ -23,18 +22,18 @@
 		$output['status']['description'] = "database unavailable";
 		$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
 		$output['data'] = [];
-
+		
 		mysqli_close($conn);
 
-		echo json_encode($output);
+		echo json_encode($output); 
 
 		exit;
 
 	}	
 
-	// first query
+	// $_REQUEST used for development / debugging. Remember to cange to $_POST for production
 
-	$query = 'SELECT * from personnel WHERE id =' . $_REQUEST['id'];
+	$query = 'SELECT id, name, locationID FROM department WHERE id = ' . $_REQUEST['id'];
 
 	$result = $conn->query($query);
 	
@@ -53,24 +52,21 @@
 
 	}
    
-   	$personnel = [];
+   	$data = [];
 
 	while ($row = mysqli_fetch_assoc($result)) {
 
-		array_push($personnel, $row);
+		array_push($data, $row);
 
 	}
-
-	// second query
-
-	
 
 	$output['status']['code'] = "200";
 	$output['status']['name'] = "ok";
 	$output['status']['description'] = "success";
 	$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-	$output['data'] = $personnel;
-	
+	$output['data'] = $data;
+
+	header('Content-Type: application/json; charset=UTF-8');
 	
 	mysqli_close($conn);
 

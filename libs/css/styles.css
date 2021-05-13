@@ -4,7 +4,12 @@ body{
 }
 
 
-
+.loading{
+    top:30%;
+    position:fixed;
+    z-index:999;
+    background-color: rgba(255, 255, 255, 0.521);
+}
 
 i{
     width:20px;
